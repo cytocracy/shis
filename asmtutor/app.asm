@@ -4,13 +4,13 @@ section .data
 msg1 db 'Please enter operator: ', 0h
 msg2 db 'Please enter first number: ', 0h
 msg3 db 'Please enter second number: ', 0h
-rem db ' remainder '
+rem db ' remainder ', 0h
 testmsg db 'test', 0Ah
 
 section .bss
-input1: resb 1
-input2: resb 1
-input3: resb 1
+input1: resb 255
+input2: resb 255
+input3: resb 255
 
 
 
@@ -25,7 +25,8 @@ _start:
     ;setup and read input
     mov ecx, input1
     call read
-    push input1
+    mov eax , input1
+    push eax
 
     ;print second line
     mov eax, msg2
@@ -34,8 +35,10 @@ _start:
     ;setup and read input
     mov ecx, input2
     call read
-    push input2
-
+    mov eax , input2
+    call atoi
+    push eax
+    
     ;print third line
     mov eax, msg3
     call sprint
@@ -43,68 +46,61 @@ _start:
     ;setup and read input
     mov ecx, input3
     call read
-    push input3
-
+    mov eax, input3
+    call atoi
+    push eax
 
     pop ebx
     pop eax
     pop ecx
-
-    call sprint
     
-    
-    ; mov eax, msg2
-    ; call sprint
-    ; mov ecx, input2
-    ; call sread
-    ; push input2
-    ; mov eax, msg3
-    ; call sprint
-    ; mov ecx, input3
-    ; call sread
-    ; push input3
+    cmp byte [ecx], 43
+    je addnum
 
-    ; pop ecx
-    ; pop ebx
-    ; pop eax
+    cmp byte [ecx], 45
+    je subnum
 
-    ; mov eax, 2Bh
-    ; mov ebx, 2
-    ; mov ecx, 3
-    ; push eax
-    ; mov eax, testmsg
-    ; call sprint
-    ; pop eax 
-    ; call sprint
+    cmp byte [ecx], 42
+    je mulnum
 
-    ; push eax
-    ; mov eax, 2Bh
-    ; call sprint
-    ; pop eax
-
-    ; push eax
-    ; mov eax, ecx
-    ; call sprint
-    ; pop eax
-    ; call addPrint
-
-    cmp eax, 43
-    je addPrint
-
-    cmp eax, 2Dh
-    je subPrint
-
-    cmp eax, 42
-    je mulPrint
-
-    cmp eax, 47
-    je divPrint
-
-
-    ; mov eax, 90
-    ; mov ebx, 9
-    ; call addPrint
+    cmp byte [ecx], 47
+    je divnum
 
     call quit
+
+addnum:
+    add eax, ebx
+    call iprintLF
+    call quit
+
+subnum:
+    sub eax, ebx
+    call iprintLF
+    call quit
+
+mulnum:
+    mul ebx
+    call iprintLF
+    call quit
+
+divnum:
+    push eax
+    push ebx
+    push edx
+    div     ebx  
+    call    iprint
+    mov     eax, rem
+    call    sprint
+    mov     eax, edx
+    call    iprintLF
+
+    pop edx
+    pop ebx
+    pop eax
+
+    call quit
+
+
+
 
 
