@@ -1,16 +1,62 @@
+atoi:
+    push    ebx            
+    push    ecx             
+    push    edx             
+    push    esi             
+    mov     esi, eax        
+    mov     eax, 0          
+    mov     ecx, 0         
+ 
+.multiplyLoop:
+    xor     ebx, ebx      
+    mov     bl, [esi+ecx]   
+    cmp     bl, 48          
+    jl      .finished       
+    cmp     bl, 57          
+    jg      .finished       
+ 
+    sub     bl, 48          
+    add     eax, ebx        
+    mov     ebx, 10         
+    mul     ebx             
+    inc     ecx             
+    jmp     .multiplyLoop   
+ 
+.finished:
+    cmp     ecx, 0          
+    je      .restore        
+    mov     ebx, 10        
+    div     ebx             
+ 
+.restore:
+    pop     esi             
+    pop     edx             
+    pop     ecx             
+    pop     ebx             
+    ret
+
 read:
     push edx
+    push ecx
     push ebx
     push eax
 
-    mov edx, 1
+    mov edx, 255
     mov ebx, 0
     mov eax, 3
 
     int 80h
 
+    mov eax,54          ; kernel function SYS_IOCTL
+    mov ebx,0           ; EBX=0: STDIN
+    mov ecx,0x540B      ; ECX=0x540B: TCFLSH
+    xor edx, edx        ; EDX=0: TCIFLUSH
+    int 80h            ; sys_call
+
+
     pop eax
     pop ebx
+    pop ecx
     pop edx
 
     ret
@@ -21,7 +67,11 @@ addPrint:
     call sprint
     pop eax
     ;test
+    mov al , [eax]
+    movzx eax, al
 
+    mov al, [ebx]
+    movzx ebx, al
 
     add eax, ebx
     ;print equal sign
@@ -175,6 +225,27 @@ sprint:
     pop edx
     ret
 ;------------------------
+
+bprint:
+    push edx
+    push eax
+    push ecx
+    push ebx
+
+    mov edx, 1
+    mov ecx, eax
+    mov ebx, 1
+    mov eax, 4
+    int 80h
+
+    pop ebx
+    pop ecx
+    pop eax
+    pop edx
+
+    ret
+
+
 
 sprintLF:
     call sprint
