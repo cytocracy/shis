@@ -11,7 +11,7 @@ section .rodata
     hello_world: db "Hello world!", 0xA, 0x0
 
 ; Start the .text section, which stores program code
-section .text
+section .text 
 _start:
     mov eax, 0x04           ; store the number 4 in the eax register (0x04 = write())
     mov ebx, 0x1            ; file descriptor (1 = standard output, 2 = standard error)
