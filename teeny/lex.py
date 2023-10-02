@@ -86,7 +86,18 @@ class Lexer:
         elif self.curChar == '\0':
             token = Token('', TokenType.EOF)
         elif self.curChar == '\"':
-            pass
+            #get chars between quotes
+            self.nextChar()
+            startPos = self.curPos
+
+            while self.curChar != '\"':
+                #don' allow special chars no 
+                if self.curChar == '\r' or self.curChar == '\n' or self.curChar == '\t' or self.curChar == '\\' or self.curChar == '%':
+                    self.abort("Illegal character in string.")
+                self.nextChar()
+
+            tokText = self.source[startPos : self.curPos]
+            token = Token(tokText, TokenType.STRING)
         else:
             self.abort("Unknown token: " + self.curChar)
 
