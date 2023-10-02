@@ -98,6 +98,35 @@ class Lexer:
 
             tokText = self.source[startPos : self.curPos]
             token = Token(tokText, TokenType.STRING)
+        elif self.curChar.isdigit():
+            startPos = self.curPos
+            while self.peek().isdigit():
+                self.nextChar()
+            if self.peek() == '.':
+                self.nextChar()
+                
+                if not self.peek().isdigit():
+                    self.abort("Illegal char in number.")
+                while self.peek().isdigit():
+                    self.nextChar()
+
+            tokText = self.source[startPos : self.curPos + 1]
+            token = Token(tokText, TokenType.NUMBER)
+            
+        elif self.curChar.isalpha():
+            #ident or kwd
+            startPos = self.curPos
+            while self.peek().isalnum():
+                self.nextChar()
+
+            #check if tok in kwds
+            tokText = self.source[startPos : self.curPos + 1]
+            keyword = Token.checkIfKeyword(tokText)
+            if keyword == None:
+                token = Token(tokText, TokenType.IDENT)
+            else:
+                token = Token(tokText, keyword)
+
         else:
             self.abort("Unknown token: " + self.curChar)
 
@@ -109,6 +138,13 @@ class Token:
     def __init__(self, tokenText, tokenKind):
         self.text = tokenText
         self.kind = tokenKind
+
+    @staticmethod
+    def checkIfKeyword(tokenText):
+        for kind in TokenType:
+            if kind.name == tokenText and kind.value >= 100 and kind.value < 200:
+                return kind
+        return None
 
 class TokenType(enum.Enum):
     EOF = -1
