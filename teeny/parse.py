@@ -54,3 +54,11 @@ class Parser:
                 self.expression()
         
         self.nl()
+
+    #nl ::= '\n'+
+    def nl(self):
+        print("NEWLINE")
+
+        self.match(TokenType.NEWLINE)
+        while self.checkToken(TokenType.NEWLINE):
+            self.nextToken()
